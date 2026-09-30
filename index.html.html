@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>班級任務積點成長系統｜多班雲端同步版</title>
+<style>
+:root{
+  --bg:#f8efec;--panel:#fffaf8;--card:#fff;--line:#ead0c9;
+  --green:#167a49;--green2:#e7f5ed;--ink:#342a27;--muted:#7d6d68;
+  --danger:#b94a48;--amber:#9a6a00;--amberbg:#fff7dc;--shadow:0 6px 18px rgba(82,54,45,.06)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}.hidden{display:none!important}
+.app{max-width:1500px;margin:auto;padding:18px}
+.topbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px 14px;box-shadow:var(--shadow)}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}.brand-icon{width:44px;height:44px;border-radius:13px;background:var(--green);color:#fff;display:grid;place-items:center;font-size:23px}
+.brand-title{font-weight:900;font-size:19px}.muted{font-size:13px;color:var(--muted)}
+.btn,.select,.input,.textarea{min-height:42px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 12px;color:var(--ink)}
+.textarea{width:100%;min-height:130px;resize:vertical}.btn{font-weight:800}.btn.primary{background:var(--green);color:#fff;border-color:var(--green)}
+.btn.soft{background:var(--green2);color:var(--green);border-color:#a8cfb8}.btn.danger{color:var(--danger)}
+.sync-pill{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:7px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13px;font-weight:800}
+.sync-pill.ok{background:var(--green2);color:var(--green);border-color:#9bc7ad}.sync-pill.warn{background:var(--amberbg);color:var(--amber);border-color:#e5cf84}
+.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:16px;box-shadow:var(--shadow)}
+.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}.stat small{color:var(--muted)}.stat strong{display:block;font-size:28px;color:var(--green);margin-top:2px}
+.notice{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.tab.active{background:var(--green2);color:var(--green);border-color:var(--green)}
+.section{margin-top:16px}.task-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.task-card{background:var(--panel);border:1px solid var(--line);border-radius:17px;overflow:hidden;box-shadow:var(--shadow)}
+.task-head{background:#fff;padding:15px}.badge{display:inline-flex;background:var(--green);color:#fff;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900}
+.task-title{font-size:18px;font-weight:900;margin-top:10px}.meta{font-size:13px;color:var(--muted);margin-top:5px}.progress{height:10px;border-radius:999px;background:#eadeda;overflow:hidden;margin-top:10px}.progress>div{height:100%;background:var(--green)}
+.student-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px;background:#fff7f4;border-top:1px solid var(--line)}
+.student-btn{min-height:50px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:7px;font-weight:800}.student-btn.done{background:var(--green2);border-color:#9cc8ad;color:var(--green)}
+.student-btn small{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-top:2px}
+.growth-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.growth-card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:16px;text-align:center;box-shadow:var(--shadow)}
+.avatar{display:grid;place-items:center;margin:0 auto 8px;border-radius:999px;background:#fff4ef;border:2px solid var(--line)}
+.s1{width:60px;height:60px;font-size:30px}.s2{width:74px;height:74px;font-size:37px}.s3{width:88px;height:88px;font-size:44px}.s4{width:102px;height:102px;font-size:51px}.s5{width:118px;height:118px;font-size:60px}
+.grow-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.panel{background:#fff;border:1px solid var(--line);border-radius:17px;padding:15px;box-shadow:var(--shadow)}.full{grid-column:1/-1}
+.row{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:130px}
+.manage-row{display:grid;grid-template-columns:1fr 100px 120px auto;gap:8px;align-items:end;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff8f5;margin-top:8px}
+.task-manage-row{display:grid;grid-template-columns:1fr 120px auto;gap:8px;align-items:end;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff8f5;margin-top:8px}
+.class-manage{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff8f5;margin-top:8px}
+.codebox{white-space:pre-wrap;word-break:break-word;background:#2e2927;color:#f8f3ef;border-radius:12px;padding:12px;font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
+.cloud-card{border:1px solid #b9d7c4;background:#f3fbf6}.status-line{margin-top:8px;font-size:13px;min-height:20px}
+.modal-backdrop{position:fixed;inset:0;background:rgba(40,30,26,.32);display:grid;place-items:center;padding:20px;z-index:20}.modal{width:min(540px,100%);background:#fff;border-radius:18px;border:1px solid var(--line);padding:18px;box-shadow:0 18px 50px rgba(50,30,20,.2)}
+.modal h3{margin-top:0}.close-row{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.report-table{width:100%;border-collapse:collapse;margin-top:10px}.report-table th,.report-table td{border-bottom:1px solid var(--line);padding:8px;text-align:left}
+@media(max-width:1000px){.task-grid,.growth-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.app{padding:10px}.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.task-grid,.growth-grid,.settings-grid{grid-template-columns:1fr}.full{grid-column:auto}.manage-row,.task-manage-row{grid-template-columns:1fr}.student-list{grid-template-columns:repeat(2,minmax(0,1fr))}.topbar>*{min-width:0}.topbar .btn,.topbar .select{flex:1}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="brand-icon">☁️</div><div><div class="brand-title">班級任務積點｜多班雲端版</div><div class="muted">五年級、六年級可分開儲存並同時使用</div></div></div>
+  <span id="syncPill" class="sync-pill warn">● 尚未連接雲端</span>
+  <select id="classSelect" class="select" aria-label="切換班級"></select>
+  <button class="btn" id="randomBtn">🎲 抽籤</button>
+  <button class="btn" id="reportBtn">📄 報表</button>
+  <button class="btn" id="cloudBtn">☁️ 雲端設定</button>
+  <button class="btn primary" id="newTaskBtn">＋ 新增任務</button>
+</header>
+
+<section class="summary">
+  <div class="stat"><small>目前班級</small><strong id="sumClass">六年級</strong></div>
+  <div class="stat"><small>進行中任務</small><strong id="sumTasks">0</strong></div>
+  <div class="stat"><small>班級完成率</small><strong id="sumRate">0%</strong></div>
+  <div class="stat"><small>班級員額</small><strong id="sumStudents">0 人</strong></div>
+</section>
+
+<section class="notice">
+  <b>💡 多班模式：</b>
+  <span class="muted">五年級與六年級各自有獨立學生名單、任務、積分與成長門檻。不同裝置可以同時開不同班級；若已登入 Firebase，兩個班級都會各自同步。</span>
+</section>
+
+<nav class="tabs">
+  <button class="btn tab active" data-tab="tasks">任務看板</button>
+  <button class="btn tab" data-tab="growth">學生角色成長</button>
+  <button class="btn tab" data-tab="settings">教師設定</button>
+</nav>
+
+<section id="tasksView" class="section"><div id="taskGrid" class="task-grid"></div></section>
+<section id="growthView" class="section hidden"><div id="growthGrid" class="growth-grid"></div></section>
+
+<section id="settingsView" class="section hidden">
+<div class="settings-grid">
+  <div class="panel full">
+    <h3>班級管理</h3>
+    <form id="classForm" class="row">
+      <label class="field"><span>新增班級名稱</span><input id="newClassName" class="input" maxlength="20" placeholder="例如：五年級A班"></label>
+      <button class="btn primary" type="submit">新增班級</button>
+    </form>
+    <div id="manageClasses"></div>
+  </div>
+
+  <div class="panel cloud-card full">
+    <h3>☁️ Firebase 雲端同步設定</h3>
+    <div id="cloudLoggedOut">
+      <p class="muted">Firebase 設定只要貼一次。登入後，每個班級會分別儲存在 <b>users / UID / classes / 班級ID</b>。</p>
+      <label class="field"><span>Firebase 設定</span><textarea id="firebaseConfigText" class="textarea" placeholder='貼上 firebaseConfig 內容'></textarea></label>
+      <div class="row" style="margin-top:10px">
+        <button class="btn primary" id="saveFirebaseBtn" type="button">儲存並連線 Firebase</button>
+        <button class="btn danger" id="clearFirebaseBtn" type="button">清除 Firebase 設定</button>
+      </div>
+      <div id="firebaseStatus" class="status-line muted"></div>
+      <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+      <div class="row">
+        <label class="field"><span>Email</span><input id="authEmail" class="input" type="email" autocomplete="username"></label>
+        <label class="field"><span>密碼</span><input id="authPassword" class="input" type="password" autocomplete="current-password" minlength="6"></label>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn primary" id="signInBtn" type="button">登入</button>
+        <button class="btn" id="signUpBtn" type="button">建立教師帳號</button>
+      </div>
+      <div id="authStatus" class="status-line muted"></div>
+    </div>
+    <div id="cloudLoggedIn" class="hidden">
+      <p><b>目前登入：</b><span id="currentUserEmail"></span></p>
+      <p class="muted">目前班級：<b id="cloudCurrentClass"></b></p>
+      <div class="row">
+        <button class="btn primary" id="pushCloudBtn" type="button">上傳目前班級</button>
+        <button class="btn" id="pullCloudBtn" type="button">重新讀取目前班級</button>
+        <button class="btn danger" id="signOutBtn" type="button">登出</button>
+      </div>
+      <div id="cloudActionStatus" class="status-line muted"></div>
+    </div>
+  </div>
+
+  <div class="panel full">
+    <h3>🔐 Firestore 安全性規則</h3>
+    <div class="codebox">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null
+                         && request.auth.uid == userId;
+    }
+  }
+}</div>
+  </div>
+
+  <div class="panel">
+    <h3>新增學生</h3>
+    <form id="studentForm" class="row">
+      <label class="field"><span>姓名／代號</span><input class="input" id="studentName" required maxlength="12"></label>
+      <label class="field"><span>角色</span><select class="select" id="studentAvatar"><option>🌱</option><option>🦖</option><option>🐰</option><option>🐱</option><option>🚀</option><option>⭐</option><option>🐳</option><option>🦊</option><option>🐼</option><option>🦁</option></select></label>
+      <button class="btn primary" type="submit">新增</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h3>角色成長門檻</h3>
+    <div class="row">
+      <label class="field"><span>階段 2</span><input class="input" id="t2" type="number" min="1"></label>
+      <label class="field"><span>階段 3</span><input class="input" id="t3" type="number" min="2"></label>
+      <label class="field"><span>階段 4</span><input class="input" id="t4" type="number" min="3"></label>
+      <label class="field"><span>階段 5</span><input class="input" id="t5" type="number" min="4"></label>
+    </div>
+    <button class="btn primary" id="saveThresholds" style="margin-top:10px">儲存門檻</button>
+    <div class="muted" id="thresholdMsg" style="margin-top:7px"></div>
+  </div>
+
+  <div class="panel full">
+    <h3>新增任務</h3>
+    <form id="taskForm" class="row">
+      <label class="field"><span>任務名稱</span><input class="input" id="taskName" required maxlength="40"></label>
+      <label class="field"><span>完成積分</span><input class="input" id="taskPoints" type="number" min="1" max="99" value="1"></label>
+      <button class="btn primary" type="submit">新增任務</button>
+    </form>
+  </div>
+
+  <div class="panel full"><h3>學生資料</h3><div id="manageStudents"></div></div>
+  <div class="panel full"><h3>任務管理</h3><div id="manageTasks"></div></div>
+</div>
+</section>
+</div>
+<div id="modalLayer"></div>
+
+<script type="module">
+const FBV="10.14.1";
+const LOCAL_KEY='class_points_multiclass_v1';
+const CONFIG_KEY='class_point_firebase_config_v1';
+const makeClass=(name)=>({
+  name, thresholds:[0,5,10,20,30],
+  students:[], tasks:[
+    {id:1,name:'帶齊學用品',points:1,done:[]},
+    {id:2,name:'上課主動回答',points:2,done:[]},
+    {id:3,name:'完成課堂任務',points:1,done:[]}
+  ], nextStudent:1,nextTask:4,updatedAt:Date.now()
+});
+const initial={
+  currentClassId:'grade6',
+  classes:{
+    grade6:{...makeClass('六年級'),students:[
+      {id:1,name:'學生A',avatar:'🌱',points:0},{id:2,name:'學生B',avatar:'🦖',points:0}
+    ],nextStudent:3},
+    grade5:{...makeClass('五年級'),students:[
+      {id:1,name:'學生A',avatar:'🐰',points:0},{id:2,name:'學生B',avatar:'🚀',points:0}
+    ],nextStudent:3}
+  }
+};
+
+let store=loadLocal();
+let firebaseConfig=loadConfig();
+let fb=null,auth=null,db=null,user=null,unsubscribe=null,writeTimer=null,suppress=false;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clone=o=>JSON.parse(JSON.stringify(o));
+function loadLocal(){try{const x=JSON.parse(localStorage.getItem(LOCAL_KEY));return normalizeStore(x)}catch{return clone(initial)}}
+function saveLocal(){localStorage.setItem(LOCAL_KEY,JSON.stringify(store))}
+function loadConfig(){try{return JSON.parse(localStorage.getItem(CONFIG_KEY)||'null')}catch{return null}}
+function current(){return store.classes[store.currentClassId]}
+function normalizeStore(x){
+  const base=clone(initial);
+  if(!x||typeof x!=='object'||!x.classes)return base;
+  const out={currentClassId:x.currentClassId,classes:{}};
+  Object.entries(x.classes).forEach(([id,c])=>{
+    const n=makeClass(String(c.name||id));
+    n.thresholds=Array.isArray(c.thresholds)&&c.thresholds.length===5?c.thresholds.map(Number):n.thresholds;
+    n.students=Array.isArray(c.students)?c.students.map(s=>({id:Number(s.id),name:String(s.name||'未命名'),avatar:String(s.avatar||'🌱'),points:Math.max(0,Number(s.points)||0)})):[];
+    n.tasks=Array.isArray(c.tasks)?c.tasks.map(t=>({id:Number(t.id),name:String(t.name||'未命名任務'),points:Math.max(1,Number(t.points)||1),done:Array.isArray(t.done)?t.done.map(Number):[]})):[];
+    n.nextStudent=Math.max(Number(c.nextStudent)||1,...n.students.map(s=>s.id+1),1);
+    n.nextTask=Math.max(Number(c.nextTask)||1,...n.tasks.map(t=>t.id+1),1);
+    n.updatedAt=Number(c.updatedAt)||Date.now(); out.classes[id]=n;
+  });
+  if(!out.classes[out.currentClassId])out.currentClassId=Object.keys(out.classes)[0]||'grade6';
+  if(!Object.keys(out.classes).length)return base;
+  return out;
+}
+function slug(){return store.currentClassId}
+function stage(p){const c=current();let s=1;for(let i=1;i<c.thresholds.length;i++)if(p>=c.thresholds[i])s=i+1;return s}
+function nextInfo(p){const c=current(),s=stage(p);if(s>=5)return{remain:0,pct:100};const low=c.thresholds[s-1],high=c.thresholds[s];return{remain:Math.max(0,high-p),pct:Math.max(0,Math.min(100,((p-low)/(high-low))*100))}}
+function rate(){const c=current(),total=c.tasks.length*c.students.length;if(!total)return 0;return Math.round(c.tasks.reduce((a,t)=>a+t.done.length,0)/total*100)}
+function setSync(text,kind='warn'){const e=$('#syncPill');e.textContent=text;e.className='sync-pill '+kind}
+function modal(html){$('#modalLayer').innerHTML=`<div class="modal-backdrop"><div class="modal">${html}<div class="close-row"><button class="btn primary" id="closeModal">關閉</button></div></div></div>`;$('#closeModal').onclick=()=>$('#modalLayer').innerHTML=''}
+function render(){
+  const c=current();
+  $('#classSelect').innerHTML=Object.entries(store.classes).map(([id,x])=>`<option value="${esc(id)}" ${id===store.currentClassId?'selected':''}>${esc(x.name)}</option>`).join('');
+  $('#sumClass').textContent=c.name;$('#sumTasks').textContent=c.tasks.length;$('#sumRate').textContent=rate()+'%';$('#sumStudents').textContent=c.students.length+' 人';
+  $('#cloudCurrentClass').textContent=c.name;
+  $('#taskGrid').innerHTML=c.tasks.map(t=>{const pct=c.students.length?Math.round(t.done.length/c.students.length*100):0;return `<article class="task-card"><div class="task-head"><span class="badge">✔ 獨立任務</span><div class="task-title">${esc(t.name)}</div><div class="meta">完成可獲得 ${t.points} 點</div><div style="display:flex;justify-content:space-between;margin-top:10px;font-size:14px"><b>已完成人數</b><b>${t.done.length}/${c.students.length} 人　${pct}%</b></div><div class="progress"><div style="width:${pct}%"></div></div></div><div class="student-list">${c.students.map(s=>{const d=t.done.includes(s.id);return `<button class="student-btn ${d?'done':''}" data-task="${t.id}" data-student="${s.id}">${esc(s.name)}<small>${d?'✓ 已完成':s.points+' 點'}</small></button>`}).join('')}</div></article>`}).join('');
+  $('#growthGrid').innerHTML=c.students.map(s=>{const st=stage(s.points),n=nextInfo(s.points);return `<article class="growth-card"><div class="avatar s${st}">${esc(s.avatar)}</div><div style="font-weight:900;font-size:18px">${esc(s.name)}</div><div style="font-size:28px;font-weight:900;color:var(--green)">${s.points} 點</div><div class="muted">階段 ${st}/5 · ${st===5?'最高階段':'再 '+n.remain+' 點升級'}</div><div class="progress"><div style="width:${n.pct}%"></div></div><div class="grow-actions"><button class="btn primary" data-add="1" data-id="${s.id}">+1</button><button class="btn" data-add="5" data-id="${s.id}">+5</button><button class="btn" data-add="-1" data-id="${s.id}">-1</button></div></article>`}).join('');
+  $('#manageStudents').innerHTML=c.students.map(s=>`<div class="manage-row"><label class="field"><span>姓名／代號</span><input class="input edit-name" data-id="${s.id}" value="${esc(s.name)}"></label><label class="field"><span>角色</span><select class="select edit-avatar" data-id="${s.id}">${['🌱','🦖','🐰','🐱','🚀','⭐','🐳','🦊','🐼','🦁'].map(a=>`<option ${a===s.avatar?'selected':''}>${a}</option>`).join('')}</select></label><label class="field"><span>積分</span><input class="input edit-points" type="number" min="0" max="9999" data-id="${s.id}" value="${s.points}"></label><button class="btn danger delete-student" data-id="${s.id}">刪除</button></div>`).join('');
+  $('#manageTasks').innerHTML=c.tasks.map(t=>`<div class="task-manage-row"><label class="field"><span>任務名稱</span><input class="input edit-task-name" data-id="${t.id}" value="${esc(t.name)}"></label><label class="field"><span>積分</span><input class="input edit-task-points" data-id="${t.id}" type="number" min="1" max="99" value="${t.points}"></label><button class="btn danger delete-task" data-id="${t.id}">刪除</button></div>`).join('');
+  $('#manageClasses').innerHTML=Object.entries(store.classes).map(([id,x])=>`<div class="class-manage"><div><b>${esc(x.name)}</b><div class="muted">${x.students.length} 位學生</div></div>${Object.keys(store.classes).length>1?`<button class="btn danger delete-class" data-id="${esc(id)}">刪除班級</button>`:''}</div>`).join('');
+  ['t2','t3','t4','t5'].forEach((id,i)=>$('#'+id).value=c.thresholds[i+1]);
+  saveLocal();
+}
+function switchTab(name){['tasks','growth','settings'].forEach(n=>{$('#'+n+'View').classList.toggle('hidden',n!==name);document.querySelector(`[data-tab="${n}"]`).classList.toggle('active',n===name)})}
+async function changed(){current().updatedAt=Date.now();render();if(user&&db&&!suppress){clearTimeout(writeTimer);writeTimer=setTimeout(()=>pushCloud(false),350)}}
+async function switchClass(id){
+  if(!store.classes[id])return;
+  if(unsubscribe){unsubscribe();unsubscribe=null}
+  store.currentClassId=id;render();
+  if(user&&db)await startListener();
+}
+function parseConfig(text){
+  let s=text.trim();const a=s.indexOf('{'),b=s.lastIndexOf('}');if(a>=0&&b>a)s=s.slice(a,b+1);
+  s=s.replace(/([,{]\s*)([A-Za-z_$][\w$]*)(\s*:)/g,'$1"$2"$3').replace(/'/g,'"');
+  const o=JSON.parse(s);['apiKey','authDomain','projectId','appId'].forEach(k=>{if(!o[k])throw new Error('缺少 '+k)});return o;
+}
+function friendly(e){const m={'auth/invalid-credential':'Email 或密碼錯誤。','auth/email-already-in-use':'這個 Email 已使用。','auth/weak-password':'密碼至少 6 碼。','auth/invalid-email':'Email 格式不正確。','auth/operation-not-allowed':'請先在 Firebase Authentication 啟用 Email/Password。','permission-denied':'Firestore 權限被拒絕，請確認 Rules 已 Publish。'};return m[e?.code]||e?.message||String(e)}
+async function initFirebase(){
+  if(!firebaseConfig){setSync('● 尚未設定 Firebase');return}
+  try{
+    const [appMod,authMod,fsMod]=await Promise.all([
+      import(`https://www.gstatic.com/firebasejs/${FBV}/firebase-app.js`),
+      import(`https://www.gstatic.com/firebasejs/${FBV}/firebase-auth.js`),
+      import(`https://www.gstatic.com/firebasejs/${FBV}/firebase-firestore.js`)
+    ]);
+    fb={appMod,authMod,fsMod};const app=appMod.initializeApp(firebaseConfig);auth=authMod.getAuth(app);db=fsMod.getFirestore(app);
+    $('#firebaseStatus').textContent='Firebase 已連線。';
+    authMod.onAuthStateChanged(auth,async u=>{
+      user=u||null;$('#cloudLoggedOut').classList.toggle('hidden',!!user);$('#cloudLoggedIn').classList.toggle('hidden',!user);
+      if(user){$('#currentUserEmail').textContent=user.email||user.uid;setSync('● 已登入，雲端同步','ok');await startListener()}
+      else{if(unsubscribe){unsubscribe();unsubscribe=null}setSync('● Firebase 已連線，尚未登入')}
+    });
+  }catch(e){$('#firebaseStatus').textContent='Firebase 連線失敗：'+friendly(e);setSync('● Firebase 連線失敗')}
+}
+function docRef(){return fb.fsMod.doc(db,'users',user.uid,'classes',slug())}
+async function startListener(){
+  if(!user||!db)return;
+  if(unsubscribe){unsubscribe();unsubscribe=null}
+  const ref=docRef(),snap=await fb.fsMod.getDoc(ref);
+  if(!snap.exists()){await fb.fsMod.setDoc(ref,{classData:current(),updatedAt:fb.fsMod.serverTimestamp()})}
+  else if(snap.data()?.classData){suppress=true;store.classes[slug()]={...makeClass(current().name),...snap.data().classData};render();suppress=false}
+  unsubscribe=fb.fsMod.onSnapshot(ref,s=>{
+    if(!s.exists()||!s.data()?.classData)return;
+    suppress=true;store.classes[slug()]={...makeClass(current().name),...s.data().classData};render();suppress=false;setSync('● 已同步','ok')
+  },e=>{setSync('● 同步中斷');$('#cloudActionStatus').textContent=friendly(e)})
+}
+async function pushCloud(show=true){
+  if(!user||!db)return;
+  try{setSync('● 正在同步…','ok');await fb.fsMod.setDoc(docRef(),{classData:current(),updatedAt:fb.fsMod.serverTimestamp()},{merge:true});setSync('● 已同步','ok');if(show)$('#cloudActionStatus').textContent='目前班級已上傳。'}catch(e){setSync('● 同步失敗');if(show)$('#cloudActionStatus').textContent=friendly(e)}
+}
+async function pullCloud(){if(!user||!db)return;const s=await fb.fsMod.getDoc(docRef());if(s.exists()&&s.data()?.classData){suppress=true;store.classes[slug()]={...makeClass(current().name),...s.data().classData};render();suppress=false;$('#cloudActionStatus').textContent='已重新讀取目前班級。'}}
+
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+$('#classSelect').addEventListener('change',e=>switchClass(e.target.value));
+$('#cloudBtn').addEventListener('click',()=>switchTab('settings'));$('#newTaskBtn').addEventListener('click',()=>{switchTab('settings');$('#taskName').focus()});
+$('#randomBtn').addEventListener('click',()=>{const c=current();if(!c.students.length)return;const s=c.students[Math.floor(Math.random()*c.students.length)];modal(`<h3>🎲 抽籤結果</h3><div style="font-size:30px;font-weight:900;text-align:center;padding:18px">${esc(s.name)}</div>`)});
+$('#reportBtn').addEventListener('click',()=>{const c=current(),rows=c.students.map(s=>`<tr><td>${esc(s.name)}</td><td>${s.points}</td><td>${stage(s.points)}</td></tr>`).join('');modal(`<h3>📄 ${esc(c.name)}報表</h3><div class="muted">完成率 ${rate()}%</div><table class="report-table"><thead><tr><th>學生</th><th>積分</th><th>階段</th></tr></thead><tbody>${rows}</tbody></table>`)});
+
+$('#taskGrid').addEventListener('click',e=>{const b=e.target.closest('[data-task]');if(!b)return;const c=current(),t=c.tasks.find(x=>x.id===+b.dataset.task),s=c.students.find(x=>x.id===+b.dataset.student);if(!t||!s)return;const i=t.done.indexOf(s.id);if(i>=0){t.done.splice(i,1);s.points=Math.max(0,s.points-t.points)}else{t.done.push(s.id);s.points+=t.points}changed()});
+$('#growthGrid').addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(!b)return;const s=current().students.find(x=>x.id===+b.dataset.id);if(!s)return;s.points=Math.max(0,Math.min(9999,s.points+(+b.dataset.add)));changed()});
+$('#classForm').addEventListener('submit',e=>{e.preventDefault();const name=$('#newClassName').value.trim();if(!name)return;let id='class_'+Date.now();store.classes[id]=makeClass(name);$('#newClassName').value='';switchClass(id)});
+$('#manageClasses').addEventListener('click',e=>{const b=e.target.closest('.delete-class');if(!b)return;if(Object.keys(store.classes).length<=1)return;delete store.classes[b.dataset.id];if(store.currentClassId===b.dataset.id)store.currentClassId=Object.keys(store.classes)[0];render()});
+$('#studentForm').addEventListener('submit',e=>{e.preventDefault();const c=current(),name=$('#studentName').value.trim();if(!name)return;c.students.push({id:c.nextStudent++,name,avatar:$('#studentAvatar').value,points:0});$('#studentName').value='';changed()});
+$('#taskForm').addEventListener('submit',e=>{e.preventDefault();const c=current(),name=$('#taskName').value.trim();if(!name)return;c.tasks.push({id:c.nextTask++,name,points:Math.max(1,Math.min(99,+$('#taskPoints').value||1)),done:[]});$('#taskName').value='';changed();switchTab('tasks')});
+$('#saveThresholds').addEventListener('click',()=>{const v=[0,+$('#t2').value,+$('#t3').value,+$('#t4').value,+$('#t5').value];if(!(v[1]>0&&v[1]<v[2]&&v[2]<v[3]&&v[3]<v[4])){$('#thresholdMsg').textContent='門檻必須依序遞增。';return}current().thresholds=v;$('#thresholdMsg').textContent='已儲存。';changed()});
+$('#manageStudents').addEventListener('change',e=>{const s=current().students.find(x=>x.id===+e.target.dataset.id);if(!s)return;if(e.target.classList.contains('edit-name'))s.name=e.target.value.trim()||'未命名';if(e.target.classList.contains('edit-avatar'))s.avatar=e.target.value;if(e.target.classList.contains('edit-points'))s.points=Math.max(0,+e.target.value||0);changed()});
+$('#manageStudents').addEventListener('click',e=>{const b=e.target.closest('.delete-student');if(!b)return;const c=current(),id=+b.dataset.id;c.students=c.students.filter(s=>s.id!==id);c.tasks.forEach(t=>t.done=t.done.filter(x=>x!==id));changed()});
+$('#manageTasks').addEventListener('change',e=>{const t=current().tasks.find(x=>x.id===+e.target.dataset.id);if(!t)return;if(e.target.classList.contains('edit-task-name'))t.name=e.target.value.trim()||'未命名任務';if(e.target.classList.contains('edit-task-points'))t.points=Math.max(1,+e.target.value||1);changed()});
+$('#manageTasks').addEventListener('click',e=>{const b=e.target.closest('.delete-task');if(!b)return;const c=current();c.tasks=c.tasks.filter(t=>t.id!==+b.dataset.id);changed()});
+
+$('#saveFirebaseBtn').addEventListener('click',()=>{try{firebaseConfig=parseConfig($('#firebaseConfigText').value);localStorage.setItem(CONFIG_KEY,JSON.stringify(firebaseConfig));$('#firebaseStatus').textContent='設定已儲存，請重新整理網頁。';modal('<h3>Firebase 設定已儲存</h3><div class="muted">請重新整理頁面後登入教師帳號。</div>')}catch(e){$('#firebaseStatus').textContent='設定錯誤：'+friendly(e)}});
+$('#clearFirebaseBtn').addEventListener('click',()=>{localStorage.removeItem(CONFIG_KEY);firebaseConfig=null;$('#firebaseConfigText').value='';$('#firebaseStatus').textContent='已清除 Firebase 設定。'});
+$('#signInBtn').addEventListener('click',async()=>{try{$('#authStatus').textContent='登入中…';await fb.authMod.signInWithEmailAndPassword(auth,$('#authEmail').value.trim(),$('#authPassword').value);$('#authStatus').textContent=''}catch(e){$('#authStatus').textContent=friendly(e)}});
+$('#signUpBtn').addEventListener('click',async()=>{try{await fb.authMod.createUserWithEmailAndPassword(auth,$('#authEmail').value.trim(),$('#authPassword').value);$('#authStatus').textContent='帳號已建立。'}catch(e){$('#authStatus').textContent=friendly(e)}});
+$('#signOutBtn').addEventListener('click',()=>fb.authMod.signOut(auth));$('#pushCloudBtn').addEventListener('click',()=>pushCloud(true));$('#pullCloudBtn').addEventListener('click',()=>pullCloud());
+
+render();
+if(firebaseConfig)$('#firebaseConfigText').value=JSON.stringify(firebaseConfig,null,2);
+initFirebase();
+</script>
+</body>
+</html>
