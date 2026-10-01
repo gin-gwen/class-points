@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>班級任務積點系統</title>
+<style>
+:root{--bg:#f8efec;--panel:#fffaf8;--card:#fff;--line:#ead0c9;--green:#167a49;--green2:#e7f5ed;--ink:#342a27;--muted:#7d6d68;--danger:#b94a48;--shadow:0 6px 18px rgba(82,54,45,.06)}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select{font:inherit}button{cursor:pointer}.hidden{display:none!important}.app{max-width:1500px;margin:auto;padding:18px}
+.topbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px 14px;box-shadow:var(--shadow)}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}.brand-icon{width:44px;height:44px;border-radius:13px;background:var(--green);color:#fff;display:grid;place-items:center;font-size:23px}.brand-title{font-weight:900;font-size:19px}
+.muted{font-size:13px;color:var(--muted)}.btn,.select,.input{min-height:42px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 12px;color:var(--ink)}
+.btn{font-weight:800}.btn.primary{background:var(--green);color:#fff;border-color:var(--green)}.btn.danger{color:var(--danger)}.class-switch{min-width:170px;font-weight:800}
+.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:16px;box-shadow:var(--shadow)}
+.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}.stat small{color:var(--muted)}.stat strong{display:block;font-size:28px;color:var(--green);margin-top:2px}
+.notice{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.tab.active{background:var(--green2);color:var(--green);border-color:var(--green)}
+.section{margin-top:16px}.task-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.task-card{background:var(--panel);border:1px solid var(--line);border-radius:17px;overflow:hidden;box-shadow:var(--shadow)}
+.task-head{background:#fff;padding:15px}.badge{display:inline-flex;background:var(--green);color:#fff;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900}.task-title{font-size:18px;font-weight:900;margin-top:10px}.meta{font-size:13px;color:var(--muted);margin-top:5px}
+.progress{height:10px;border-radius:999px;background:#eadeda;overflow:hidden;margin-top:10px}.progress>div{height:100%;background:var(--green)}.student-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px;background:#fff7f4;border-top:1px solid var(--line)}
+.student-btn{min-height:50px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:7px;font-weight:800}.student-btn.done{background:var(--green2);border-color:#9cc8ad;color:var(--green)}.student-btn small{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-top:2px}
+.growth-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.growth-card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:16px;text-align:center;box-shadow:var(--shadow)}
+.avatar{display:grid;place-items:center;margin:0 auto 8px;border-radius:999px;background:#fff4ef;border:2px solid var(--line)}.s1{width:60px;height:60px;font-size:30px}.s2{width:74px;height:74px;font-size:37px}.s3{width:88px;height:88px;font-size:44px}.s4{width:102px;height:102px;font-size:51px}.s5{width:118px;height:118px;font-size:60px}
+.grow-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.panel{background:#fff;border:1px solid var(--line);border-radius:17px;padding:15px;box-shadow:var(--shadow)}.full{grid-column:1/-1}
+.row{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:130px}.manage-row{display:grid;grid-template-columns:1fr 100px 120px auto;gap:8px;align-items:end;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff8f5;margin-top:8px}
+.task-manage-row{display:grid;grid-template-columns:1fr 120px auto;gap:8px;align-items:end;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff8f5;margin-top:8px}.class-manage{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff8f5;margin-top:8px}
+.error{display:none;margin-top:12px;padding:12px;border-radius:12px;border:1px solid #e4a2a0;background:#fff3f2;color:#8d2f2c}
+.modal-backdrop{position:fixed;inset:0;background:rgba(40,30,26,.32);display:grid;place-items:center;padding:20px;z-index:20}.modal{width:min(560px,100%);background:#fff;border-radius:18px;border:1px solid var(--line);padding:18px;box-shadow:0 18px 50px rgba(50,30,20,.2)}.modal h3{margin-top:0}.close-row{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.report-table{width:100%;border-collapse:collapse;margin-top:10px}.report-table th,.report-table td{border-bottom:1px solid var(--line);padding:8px;text-align:left}
+@media(max-width:1000px){.task-grid,.growth-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.app{padding:10px}.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.task-grid,.growth-grid,.settings-grid{grid-template-columns:1fr}.full{grid-column:auto}.manage-row,.task-manage-row{grid-template-columns:1fr}.student-list{grid-template-columns:repeat(2,minmax(0,1fr))}.topbar .btn,.topbar .select{flex:1}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="brand-icon">🏫</div><div><div class="brand-title">班級任務積點</div><div class="muted">五年級、六年級分開使用</div></div></div>
+  <select id="classSelect" class="select class-switch" aria-label="切換班級">
+    <option value="grade6">🏫 六年級</option>
+    <option value="grade5">🏫 五年級</option>
+  </select>
+  <button class="btn" id="randomBtn" type="button">🎲 抽籤</button>
+  <button class="btn" id="reportBtn" type="button">📄 報表</button>
+  <button class="btn" id="backupBtn" type="button">💾 備份</button>
+  <button class="btn primary" id="newTaskBtn" type="button">＋ 新增任務</button>
+</header>
+
+<section class="summary">
+  <div class="stat"><small>目前班級</small><strong id="sumClass">六年級</strong></div>
+  <div class="stat"><small>進行中任務</small><strong id="sumTasks">3</strong></div>
+  <div class="stat"><small>班級完成率</small><strong id="sumRate">0%</strong></div>
+  <div class="stat"><small>班級員額</small><strong id="sumStudents">2 人</strong></div>
+</section>
+
+<section class="notice"><b>💡 使用方式：</b><span class="muted"> 五年級與六年級各自有獨立的學生名單、任務、積分與成長門檻。資料會自動保存在這台電腦目前使用的瀏覽器中；建議定期用「備份」匯出 JSON 檔保存。</span></section>
+<div id="errorBox" class="error"></div>
+
+<nav class="tabs">
+  <button class="btn tab active" type="button" data-tab="tasks">任務看板</button>
+  <button class="btn tab" type="button" data-tab="growth">學生角色成長</button>
+  <button class="btn tab" type="button" data-tab="settings">教師設定</button>
+</nav>
+
+<section id="tasksView" class="section"><div id="taskGrid" class="task-grid"></div></section>
+<section id="growthView" class="section hidden"><div id="growthGrid" class="growth-grid"></div></section>
+
+<section id="settingsView" class="section hidden">
+<div class="settings-grid">
+  <div class="panel full">
+    <h3>班級管理</h3>
+    <form id="classForm" class="row">
+      <label class="field"><span>新增班級名稱</span><input id="newClassName" class="input" maxlength="20" placeholder="例如：五年級A班"></label>
+      <button class="btn primary" type="submit">新增班級</button>
+    </form>
+    <div id="manageClasses"></div>
+  </div>
+
+  <div class="panel">
+    <h3>新增學生</h3>
+    <form id="studentForm" class="row">
+      <label class="field"><span>姓名／代號</span><input class="input" id="studentName" required maxlength="12" placeholder="例如：小安"></label>
+      <label class="field"><span>角色</span><select class="select" id="studentAvatar"><option>🌱</option><option>🦖</option><option>🐰</option><option>🐱</option><option>🚀</option><option>⭐</option><option>🐳</option><option>🦊</option><option>🐼</option><option>🦁</option></select></label>
+      <button class="btn primary" type="submit">新增</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h3>角色成長門檻</h3>
+    <div class="row">
+      <label class="field"><span>階段 2</span><input class="input" id="t2" type="number" min="1"></label>
+      <label class="field"><span>階段 3</span><input class="input" id="t3" type="number" min="2"></label>
+      <label class="field"><span>階段 4</span><input class="input" id="t4" type="number" min="3"></label>
+      <label class="field"><span>階段 5</span><input class="input" id="t5" type="number" min="4"></label>
+    </div>
+    <button class="btn primary" id="saveThresholds" type="button" style="margin-top:10px">儲存門檻</button>
+    <div class="muted" id="thresholdMsg" style="margin-top:7px"></div>
+  </div>
+
+  <div class="panel full">
+    <h3>新增任務</h3>
+    <form id="taskForm" class="row">
+      <label class="field"><span>任務名稱</span><input class="input" id="taskName" required maxlength="40" placeholder="例如：帶齊學用品"></label>
+      <label class="field"><span>完成積分</span><input class="input" id="taskPoints" type="number" min="1" max="99" value="1"></label>
+      <button class="btn primary" type="submit">新增任務</button>
+    </form>
+  </div>
+
+  <div class="panel full"><h3>學生資料</h3><div id="manageStudents"></div></div>
+  <div class="panel full"><h3>任務管理</h3><div id="manageTasks"></div></div>
+
+  <div class="panel full">
+    <h3>資料備份與還原</h3>
+    <div class="row">
+      <button class="btn" id="exportBtn" type="button">匯出 JSON 備份</button>
+      <label class="btn" style="display:inline-flex;align-items:center">匯入 JSON<input id="importFile" type="file" accept=".json" hidden></label>
+      <button class="btn danger" id="resetBtn" type="button">恢復預設資料</button>
+    </div>
+  </div>
+</div>
+</section>
+</div>
+<div id="modalLayer"></div>
+
+<script>
+(function(){
+"use strict";
+var KEY="class_points_local_multiclass_v3";
+
+function makeClass(name){
+  return {
+    name:name,
+    thresholds:[0,5,10,20,30],
+    students:[],
+    tasks:[
+      {id:1,name:"帶齊學用品",points:1,done:[]},
+      {id:2,name:"上課主動回答",points:2,done:[]},
+      {id:3,name:"完成課堂任務",points:1,done:[]}
+    ],
+    nextStudent:1,
+    nextTask:4
+  };
+}
+var initial={
+  currentClassId:"grade6",
+  classes:{
+    grade6:{name:"六年級",thresholds:[0,5,10,20,30],students:[{id:1,name:"學生A",avatar:"🌱",points:0},{id:2,name:"學生B",avatar:"🦖",points:0}],tasks:[{id:1,name:"帶齊學用品",points:1,done:[]},{id:2,name:"上課主動回答",points:2,done:[]},{id:3,name:"完成課堂任務",points:1,done:[]}],nextStudent:3,nextTask:4},
+    grade5:{name:"五年級",thresholds:[0,5,10,20,30],students:[{id:1,name:"學生A",avatar:"🐰",points:0},{id:2,name:"學生B",avatar:"🚀",points:0}],tasks:[{id:1,name:"帶齊學用品",points:1,done:[]},{id:2,name:"上課主動回答",points:2,done:[]},{id:3,name:"完成課堂任務",points:1,done:[]}],nextStudent:3,nextTask:4}
+  }
+};
+
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function byId(id){return document.getElementById(id);}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function safeLoad(){
+  try{
+    var raw=localStorage.getItem(KEY);
+    if(!raw){return clone(initial);}
+    return normalize(JSON.parse(raw));
+  }catch(e){
+    return clone(initial);
+  }
+}
+function normalize(x){
+  if(!x || typeof x!=="object" || !x.classes){return clone(initial);}
+  var ids=Object.keys(x.classes);
+  if(!ids.length){return clone(initial);}
+  var out={currentClassId:x.currentClassId,classes:{}};
+  ids.forEach(function(id){
+    var c=x.classes[id]||{};
+    var n=makeClass(String(c.name||id));
+    if(Array.isArray(c.thresholds) && c.thresholds.length===5){n.thresholds=c.thresholds.map(Number);}
+    if(Array.isArray(c.students)){
+      n.students=c.students.map(function(s){
+        return {id:Number(s.id),name:String(s.name||"未命名"),avatar:String(s.avatar||"🌱"),points:Math.max(0,Number(s.points)||0)};
+      });
+    }
+    if(Array.isArray(c.tasks)){
+      n.tasks=c.tasks.map(function(t){
+        return {id:Number(t.id),name:String(t.name||"未命名任務"),points:Math.max(1,Number(t.points)||1),done:Array.isArray(t.done)?t.done.map(Number):[]};
+      });
+    }
+    n.nextStudent=Math.max.apply(null,[Number(c.nextStudent)||1,1].concat(n.students.map(function(s){return s.id+1;})));
+    n.nextTask=Math.max.apply(null,[Number(c.nextTask)||1,1].concat(n.tasks.map(function(t){return t.id+1;})));
+    out.classes[id]=n;
+  });
+  if(!out.classes[out.currentClassId]){out.currentClassId=Object.keys(out.classes)[0];}
+  return out;
+}
+var store=safeLoad();
+function current(){return store.classes[store.currentClassId];}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+function stage(p){
+  var c=current(),s=1,i;
+  for(i=1;i<c.thresholds.length;i++){if(p>=c.thresholds[i]){s=i+1;}}
+  return s;
+}
+function nextInfo(p){
+  var c=current(),s=stage(p),lo,hi,pct;
+  if(s>=5){return {remain:0,pct:100};}
+  lo=c.thresholds[s-1];hi=c.thresholds[s];
+  pct=((p-lo)/(hi-lo))*100;
+  return {remain:Math.max(0,hi-p),pct:Math.max(0,Math.min(100,pct))};
+}
+function rate(){
+  var c=current(),total=c.tasks.length*c.students.length,done=0,i;
+  if(!total){return 0;}
+  for(i=0;i<c.tasks.length;i++){done+=c.tasks[i].done.length;}
+  return Math.round(done/total*100);
+}
+function showError(msg){
+  var e=byId("errorBox");
+  e.style.display="block";
+  e.textContent="程式載入提示："+msg;
+}
+function modal(html){
+  byId("modalLayer").innerHTML='<div class="modal-backdrop"><div class="modal">'+html+'<div class="close-row"><button class="btn primary" id="closeModal" type="button">關閉</button></div></div></div>';
+  byId("closeModal").onclick=function(){byId("modalLayer").innerHTML="";};
+}
+function render(){
+  var c=current(),classSelect=byId("classSelect"),classIds=Object.keys(store.classes);
+  classSelect.innerHTML="";
+  classIds.forEach(function(id){
+    var opt=document.createElement("option");
+    opt.value=id;
+    opt.textContent="🏫 "+store.classes[id].name;
+    if(id===store.currentClassId){opt.selected=true;}
+    classSelect.appendChild(opt);
+  });
+
+  byId("sumClass").textContent=c.name;
+  byId("sumTasks").textContent=String(c.tasks.length);
+  byId("sumRate").textContent=rate()+"%";
+  byId("sumStudents").textContent=c.students.length+" 人";
+
+  byId("taskGrid").innerHTML=c.tasks.map(function(t){
+    var pct=c.students.length?Math.round(t.done.length/c.students.length*100):0;
+    var students=c.students.map(function(s){
+      var done=t.done.indexOf(s.id)>=0;
+      return '<button class="student-btn '+(done?'done':'')+'" type="button" data-task="'+t.id+'" data-student="'+s.id+'">'+escapeHtml(s.name)+'<small>'+(done?'✓ 已完成':s.points+' 點')+'</small></button>';
+    }).join("");
+    return '<article class="task-card"><div class="task-head"><span class="badge">✔ 獨立任務</span><div class="task-title">'+escapeHtml(t.name)+'</div><div class="meta">完成可獲得 '+t.points+' 點</div><div style="display:flex;justify-content:space-between;margin-top:10px;font-size:14px"><b>已完成人數</b><b>'+t.done.length+'/'+c.students.length+' 人　'+pct+'%</b></div><div class="progress"><div style="width:'+pct+'%"></div></div></div><div class="student-list">'+students+'</div></article>';
+  }).join("");
+
+  byId("growthGrid").innerHTML=c.students.map(function(s){
+    var st=stage(s.points),n=nextInfo(s.points);
+    return '<article class="growth-card"><div class="avatar s'+st+'">'+escapeHtml(s.avatar)+'</div><div style="font-weight:900;font-size:18px">'+escapeHtml(s.name)+'</div><div style="font-size:28px;font-weight:900;color:var(--green)">'+s.points+' 點</div><div class="muted">成長階段 '+st+'/5 · '+(st===5?'已達最高階段':'再 '+n.remain+' 點升級')+'</div><div class="progress"><div style="width:'+n.pct+'%"></div></div><div class="grow-actions"><button class="btn primary" type="button" data-add="1" data-id="'+s.id+'">+1</button><button class="btn" type="button" data-add="5" data-id="'+s.id+'">+5</button><button class="btn" type="button" data-add="-1" data-id="'+s.id+'">-1</button></div></article>';
+  }).join("");
+
+  byId("manageStudents").innerHTML=c.students.map(function(s){
+    var avatars=["🌱","🦖","🐰","🐱","🚀","⭐","🐳","🦊","🐼","🦁"].map(function(a){return '<option '+(a===s.avatar?'selected':'')+'>'+a+'</option>';}).join("");
+    return '<div class="manage-row"><label class="field"><span>姓名／代號</span><input class="input edit-name" data-id="'+s.id+'" value="'+escapeHtml(s.name)+'"></label><label class="field"><span>角色</span><select class="select edit-avatar" data-id="'+s.id+'">'+avatars+'</select></label><label class="field"><span>積分</span><input class="input edit-points" type="number" min="0" max="9999" data-id="'+s.id+'" value="'+s.points+'"></label><button class="btn danger delete-student" type="button" data-id="'+s.id+'">刪除</button></div>';
+  }).join("");
+
+  byId("manageTasks").innerHTML=c.tasks.map(function(t){
+    return '<div class="task-manage-row"><label class="field"><span>任務名稱</span><input class="input edit-task-name" data-id="'+t.id+'" value="'+escapeHtml(t.name)+'"></label><label class="field"><span>積分</span><input class="input edit-task-points" data-id="'+t.id+'" type="number" min="1" max="99" value="'+t.points+'"></label><button class="btn danger delete-task" type="button" data-id="'+t.id+'">刪除</button></div>';
+  }).join("");
+
+  byId("manageClasses").innerHTML=classIds.map(function(id){
+    var x=store.classes[id],del=classIds.length>1?'<button class="btn danger delete-class" type="button" data-id="'+escapeHtml(id)+'">刪除班級</button>':"";
+    return '<div class="class-manage"><div><b>'+escapeHtml(x.name)+'</b><div class="muted">'+x.students.length+' 位學生</div></div>'+del+'</div>';
+  }).join("");
+
+  ["t2","t3","t4","t5"].forEach(function(id,i){byId(id).value=c.thresholds[i+1];});
+  save();
+}
+function switchTab(name){
+  ["tasks","growth","settings"].forEach(function(n){
+    byId(n+"View").classList.toggle("hidden",n!==name);
+    var b=document.querySelector('[data-tab="'+n+'"]');
+    if(b){b.classList.toggle("active",n===name);}
+  });
+}
+function changed(){render();}
+
+try{
+  document.querySelectorAll(".tab").forEach(function(b){b.addEventListener("click",function(){switchTab(b.getAttribute("data-tab"));});});
+  byId("classSelect").addEventListener("change",function(e){store.currentClassId=e.target.value;render();});
+  byId("newTaskBtn").addEventListener("click",function(){switchTab("settings");byId("taskName").focus();});
+  byId("backupBtn").addEventListener("click",function(){switchTab("settings");});
+  byId("randomBtn").addEventListener("click",function(){var c=current();if(!c.students.length){return;}var s=c.students[Math.floor(Math.random()*c.students.length)];modal("<h3>🎲 抽籤結果</h3><div style='font-size:30px;font-weight:900;text-align:center;padding:18px'>"+escapeHtml(s.name)+"</div>");});
+  byId("reportBtn").addEventListener("click",function(){var c=current(),rows=c.students.map(function(s){return "<tr><td>"+escapeHtml(s.name)+"</td><td>"+s.points+"</td><td>"+stage(s.points)+"</td></tr>";}).join("");modal("<h3>📄 "+escapeHtml(c.name)+"報表</h3><div class='muted'>完成率 "+rate()+"%｜總積分 "+c.students.reduce(function(a,s){return a+s.points;},0)+" 點</div><table class='report-table'><thead><tr><th>學生</th><th>積分</th><th>階段</th></tr></thead><tbody>"+rows+"</tbody></table>");});
+
+  byId("taskGrid").addEventListener("click",function(e){var b=e.target.closest("[data-task]");if(!b){return;}var c=current(),tid=Number(b.getAttribute("data-task")),sid=Number(b.getAttribute("data-student")),t=c.tasks.find(function(x){return x.id===tid;}),s=c.students.find(function(x){return x.id===sid;});if(!t||!s){return;}var i=t.done.indexOf(s.id);if(i>=0){t.done.splice(i,1);s.points=Math.max(0,s.points-t.points);}else{t.done.push(s.id);s.points+=t.points;}changed();});
+  byId("growthGrid").addEventListener("click",function(e){var b=e.target.closest("[data-add]");if(!b){return;}var id=Number(b.getAttribute("data-id")),add=Number(b.getAttribute("data-add")),s=current().students.find(function(x){return x.id===id;});if(!s){return;}s.points=Math.max(0,Math.min(9999,s.points+add));changed();});
+
+  byId("classForm").addEventListener("submit",function(e){e.preventDefault();var name=byId("newClassName").value.trim();if(!name){return;}var id="class_"+Date.now();store.classes[id]=makeClass(name);store.currentClassId=id;byId("newClassName").value="";render();});
+  byId("manageClasses").addEventListener("click",function(e){var b=e.target.closest(".delete-class");if(!b||Object.keys(store.classes).length<=1){return;}var id=b.getAttribute("data-id");delete store.classes[id];if(store.currentClassId===id){store.currentClassId=Object.keys(store.classes)[0];}render();});
+  byId("studentForm").addEventListener("submit",function(e){e.preventDefault();var c=current(),name=byId("studentName").value.trim();if(!name){return;}c.students.push({id:c.nextStudent++,name:name,avatar:byId("studentAvatar").value,points:0});byId("studentName").value="";changed();});
+  byId("taskForm").addEventListener("submit",function(e){e.preventDefault();var c=current(),name=byId("taskName").value.trim();if(!name){return;}var pts=Math.max(1,Math.min(99,Number(byId("taskPoints").value)||1));c.tasks.push({id:c.nextTask++,name:name,points:pts,done:[]});byId("taskName").value="";byId("taskPoints").value="1";changed();switchTab("tasks");});
+  byId("saveThresholds").addEventListener("click",function(){var v=[0,Number(byId("t2").value),Number(byId("t3").value),Number(byId("t4").value),Number(byId("t5").value)];if(!(v[1]>0&&v[1]<v[2]&&v[2]<v[3]&&v[3]<v[4])){byId("thresholdMsg").textContent="門檻必須依序遞增，例如 5、10、20、30。";return;}current().thresholds=v;byId("thresholdMsg").textContent="已儲存。";changed();});
+  byId("manageStudents").addEventListener("change",function(e){var id=Number(e.target.getAttribute("data-id")),s=current().students.find(function(x){return x.id===id;});if(!s){return;}if(e.target.classList.contains("edit-name")){s.name=e.target.value.trim()||"未命名";}if(e.target.classList.contains("edit-avatar")){s.avatar=e.target.value;}if(e.target.classList.contains("edit-points")){s.points=Math.max(0,Math.min(9999,Number(e.target.value)||0));}changed();});
+  byId("manageStudents").addEventListener("click",function(e){var b=e.target.closest(".delete-student");if(!b){return;}var c=current(),id=Number(b.getAttribute("data-id"));c.students=c.students.filter(function(s){return s.id!==id;});c.tasks.forEach(function(t){t.done=t.done.filter(function(x){return x!==id;});});changed();});
+  byId("manageTasks").addEventListener("change",function(e){var id=Number(e.target.getAttribute("data-id")),t=current().tasks.find(function(x){return x.id===id;});if(!t){return;}if(e.target.classList.contains("edit-task-name")){t.name=e.target.value.trim()||"未命名任務";}if(e.target.classList.contains("edit-task-points")){t.points=Math.max(1,Math.min(99,Number(e.target.value)||1));}changed();});
+  byId("manageTasks").addEventListener("click",function(e){var b=e.target.closest(".delete-task");if(!b){return;}var c=current(),id=Number(b.getAttribute("data-id"));c.tasks=c.tasks.filter(function(t){return t.id!==id;});changed();});
+
+  byId("exportBtn").addEventListener("click",function(){var blob=new Blob([JSON.stringify(store,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="班級積點系統備份.json";a.click();setTimeout(function(){URL.revokeObjectURL(a.href);},500);});
+  byId("importFile").addEventListener("change",function(e){var f=e.target.files[0];if(!f){return;}var r=new FileReader();r.onload=function(){try{store=normalize(JSON.parse(r.result));render();modal("<h3>匯入成功</h3><div class='muted'>班級資料已還原。</div>");}catch(err){modal("<h3>匯入失敗</h3><div class='muted'>請確認檔案是本系統匯出的 JSON 備份。</div>");}e.target.value="";};r.readAsText(f);});
+  byId("resetBtn").addEventListener("click",function(){if(confirm("確定要恢復預設資料嗎？目前所有班級資料都會被清除。")){store=clone(initial);render();}});
+
+  render();
+}catch(err){
+  showError(err && err.message ? err.message : String(err));
+}
+})();
+</script>
+</body>
+</html>
